@@ -16,4 +16,9 @@ final class UserController {
             }
         }
     }
+    
+    // Register Handler... Uses Authentication
+    func renderRegister(_ req: Request) throws -> Future<View> {
+        return try req.view().render("register")
+    }
 }
