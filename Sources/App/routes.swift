@@ -6,21 +6,15 @@ import Routing // added
 /// Register your application's routes here.
 public func routes(_ router: Router) throws {
     
-    
-    // MARK: GET routes
-    router.get("movies") { req -> Future<View> in
-        return try req.view().render("fresh_tomatoes")
-    }
-    
-    // Diving into databases
-    let userController = UserController()
-    router.get("users", use: userController.list) // much shortened version
-    
-    // MARK: POST routes
-    router.post("users", use: userController.create)
-    
     // MARK: Authentication routes
+    let userController = UserController()
     router.get("register", use: userController.renderRegister)
+    router.post("register", use: userController.register)
+    router.get("login", use: userController.renderLogin)
+    
+    // Authentication handler
+    let authSessionRouter = router.grouped(User.authSessionsMiddleware())
+    authSessionRouter.post("login", use: userController.login)
     
 }
 
