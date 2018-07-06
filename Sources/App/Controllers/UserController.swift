@@ -11,7 +11,11 @@ final class UserController {
     
     func register(_ req: Request) throws -> Future<Response> {
         return try req.content.decode(User.self).flatMap { user in
-            return try User.query(on: req).filter(\User.email == user.email).first().flatMap { result in
+            return try User
+                .query(on: req)
+                .filter(\User.email == user.email)
+                .first()
+                .flatMap { result in
                 if let _ = result {
                     return Future.map(on: req) {
                         return req.redirect(to: "/register")
@@ -42,5 +46,15 @@ final class UserController {
                     return req.redirect(to: "/profile")
             }
         }
+    }
+    
+    func renderProfile(_ req: Request) throws -> Future<View> {
+        let user = try req.requireAuthenticated(User.self)
+        return try req.view().render("profile", ["user" : user])
+    }
+    
+    func logout(_ req: Request) throws -> Future<Response> {
+        try req.unauthenticateSession(User.self)
+        return Future.map(on: req) { return req.redirect(to: "/login") }
     }
 }
